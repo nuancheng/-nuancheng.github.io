@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>登陆</title>
+	<link rel="stylesheet" href="index.css">
+</head>
+<body>
+<div class="memu">
+	<form action="">
+		<p>
+			<label for="">昵称</label>
+			<input class="name" type="text" value="6~12位字母、数字、下划线组成，不可与他人重复">
+			<i></i>
+		</p>
+		<p>
+			<label for="">手机号</label>
+			<input class="cell" type="text" value="大陆11位手机号码，可用于登录和找回密码">
+			<i></i>
+		</p>
+		<p>
+			<label for="">邮箱</label>
+			<input class="email" type="text" value="支持QQ，163邮箱，可用于登录和找回密码">
+			<i></i>
+		</p>
+		<p>
+			<label for="">密码</label>
+			<input class="passone" type="password" value="">
+			<i></i>
+		</p>
+		<p>
+			<label for="">确认密码</label>
+			<input class="passtwo" type="password" value="">
+			<i></i>
+		</p>
+		<span>
+			<label for="">验证码</label>
+			<input class="cellcode" type="text" value="验证码">
+			<div class="btn"><input type="submit" value="获取短信验证码"></div>
+			<i></i>
+		</span>
+		<div class="xvan">
+			<input type="checkbox" name="" checked>阅读并接受<a href="#">《百度用户协议》</a>
+		</div>
+		<div class="btn1">
+			<input class="register" type="button" value="注册">
+		</div>
+	</form>
+</div>
+<div class="dmemu disn">
+<div class="memu1">
+	<form action="">
+		<p>
+			<label for="">昵称</label>
+			<input class="dname" type="text" value="注册时昵称、手机号、邮箱可用">
+			<i></i>
+		</p>
+		<p>
+			<label for="">密码</label>
+			<input class="dpassone" type="password" value="">
+			<i></i>
+		</p>
+		<div class="btn1">
+			<input class="dregister" type="button" value="登陆">
+		</div>
+	</form>
+
+</div>
+<div class="box disn"></div>
+</div>
+<canvas id="canvas"></canvas>
+<script src="jquery-1.10.2.js" type="text/javascript"></script>
+<script src="index.js"></script>
+</body>
+</html>
