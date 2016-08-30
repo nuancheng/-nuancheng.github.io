@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>鸡蛋画布</title>
+	<style>
+	</style>
+</head>
+<body>
+<canvas id="canvas_title" width="370" height="370"></canvas>
+<canvas class="item_canvas" width="192" height="192"></canvas>
+	<script>
+		/************************************************************
+ *
+ *	mon cifaka	- canvas.js -
+ *
+ ***********************************************************/
+
+var createCanvas = function()
+{
+	var thumbList = [];
+	var logoCircle;
+	var beforeScrollY = 0;
+	var canvasNum = 0;
+	
+	function MorfingCircle( canvas, w, h, r, numVertices, spring, friction, img )
+	{
+		var _W	= w;
+		var _H	= h;
+		var _canvas  = canvas;
+		var _g		 = _canvas.getContext( "2d" );
+		var _pattern = ( img ) ? _g.createPattern( img, "repeat" ) : "no_image";
+		var _x = _W * 0.5;
+		var _y = _H * 0.5;
+		var _r = r;
+		var _numVertices = numVertices || 8;
+		var _points = [];
+		var _isMouseInCircle = false;
+		var _mouseX = 0;
+		var _mouseY = 0;
+		var _spring = spring || 0.015;
+		var _friction = friction || 0.93;
+		var _scrollPowerBase = Math.random()*1.25 + 0.1;
+		var yuragiInterval = 0;
+		
+		this.init = function()
+		{
+			var rot = 360 / _numVertices;
+			for( var i = 0; i < _numVertices; i++ )
+			{
+				var rad = Math.PI * rot * i / 180;
+				_points.push( new AnchorPoint2D( _r * Math.cos( rad ) + _x, _r * Math.sin( rad ) + _y ));
+			}
+		};
+		
+		this.update = function()
+		{
+			var pt;
+			for( var i = 0; i < _numVertices; i++ )
+			{
+				pt = _points[i];
+				
+				var aX = ( pt.defX - pt.posX ) * _spring;
+				var aY = ( pt.defY - pt.posY ) * _spring;
+				
+				var vx = pt.vX = ( pt.vX + aX ) * _friction;
+				var vy = pt.vY = ( pt.vY + aY ) * _friction;
+				
+				pt.posX += vx;
+				pt.posY += vy;
+			}
+			
+			_g.clearRect( 0, 0, _W, _H );
+			
+			if( _pattern == "no_image" )
+			{
+				_g.fillStyle = _g.strokeStyle = "#e6e5e5";
+				_g.beginPath();
+				drawBall( 2 );
+				_g.closePath();
+				_g.fill();
+				_g.lineWidth = 4;
+				_g.stroke();
+			}
+			//if ( _pattern != "no_image" )
+			//else
+			//{
+				//_g.fillStyle = "#c4c3c0";
+				//_g.beginPath();
+				//drawBall( -1 );
+				//_g.closePath();
+				//_g.fill();
+			//}
+			
+			_g.fillStyle = (_pattern != "no_image")?_pattern:"#fefefe";
+			
+			//if( _pattern == "no_image" )
+			//{
+				//_g.strokeStyle = "#efefef";
+			//}
+			
+			_g.beginPath();
+			drawBall( 0 );
+			_g.closePath();
+			_g.fill();
+			
+			//if( _pattern == "no_image" )
+			//{
+				//_g.lineWidth = 4;
+				//_g.stroke();
+			//}
+		}
+		
+		function drawBall( offsetY )
+		{
+			var pt1 = _points[ _numVertices - 1 ];
+			var pos1X = pt1.posX;
+			var pos1Y = pt1.posY;
+			var pt2 = _points[ 0 ];
+			var pos2X = pt2.posX;
+			var pos2Y = pt2.posY;
+			_g.moveTo( ( pos1X + pos2X ) * 0.5, ( ( pos1Y + pos2Y ) * 0.5 ) + offsetY );
+			for( var i = 0; i < _numVertices; i++ )
+			{
+				pt1 = _points[i];
+				pt2 = _points[ ( i < _numVertices - 1 )? ( i+1 ) : 0 ];
+				pos1X = pt1.posX;
+				pos1Y = pt1.posY;
+				pos2X = pt2.posX;
+				pos2Y = pt2.posY;
+				_g.quadraticCurveTo( pos1X, pos1Y + offsetY, ( pos1X + pos2X ) * 0.5, (( pos1Y + pos2Y ) * 0.5 ) + offsetY );
+			}
+		}
+		
+		this.addRandomMotion = function( fix )
+		{
+			for( i = 0; i < _numVertices; i++ )
+			{
+				var pt = _points[i];
+				pt.thetaX += pt.addThetaX;
+				pt.thetaY += pt.addThetaY;
+				pt.defX = pt.baseX + ( pt.yugami * Math.sin( pt.thetaX ) * fix );
+				pt.defY = pt.baseY + ( pt.yugami * Math.cos( pt.thetaY ) * fix );
+			}
+		}
+		
+		this.addVerticalPower = function( pow )
+		{
+			pow *= _scrollPowerBase;
+			for( i = 0; i < _numVertices; i++ )
+			{
+				var pt = _points[i];
+				var pow2;
+				if( pow < 0 )
+				{
+					pow2 = pow * pt.posY / 100;
+					if( i == 2 )pow2 *= 2.6;
+					pow2 -= 0.1;
+				}
+				else
+				{
+					pow2 = pow * ( 190 - pt.posY ) / 100;
+					if( i == 6 )pow2 *= 2.6; 
+					pow2 += 0.1;
+				}
+				pt.vY -= pow2;
+			}
+		}
+		
+		_canvas.onmouseover = function( e )
+		{
+			var rect = e.target.getBoundingClientRect();
+			_mouseX = e.clientX - rect.left;
+			_mouseY = e.clientY - rect.top;
+		}
+		
+		_canvas.onmousemove = function( e )
+		{
+			var rect = e.target.getBoundingClientRect();
+			var tmpMouseX = e.clientX - rect.left;
+			var tmpMouseY = e.clientY - rect.top;
+			
+			var prevInCircle = _isMouseInCircle;
+			var dx = tmpMouseX - _x;
+			var dy = tmpMouseY - _y;
+			_isMouseInCircle = ( Math.sqrt( dx * dx + dy * dy ) <= ( _r - 3 ) );
+			
+			var oldMouseX = _mouseX;
+			var oldMouseY = _mouseY;
+			_mouseX = tmpMouseX;
+			_mouseY = tmpMouseY;
+			
+			if( prevInCircle != _isMouseInCircle )
+			{
+				var dist = getDistance( oldMouseX, oldMouseY, _mouseX, _mouseY );
+				var mouseVecX = _mouseX - oldMouseX;
+				var mouseVecY = _mouseY - oldMouseY;
+				var mA =  oldMouseY - _mouseY;
+				var mB = -( oldMouseX - _mouseX );
+				var mC = -mA * _mouseX - mB * _mouseY;
+				var interSections = getIntersection( mA, mB, mC );
+				if( interSections.length > 0 )
+				{
+					var mCenterX = ( _mouseX + oldMouseX ) * 0.5;
+					var mCenterY = ( _mouseY + oldMouseY ) * 0.5;
+					var mDistList = [];
+					for( var i = 0, num = interSections.length; i < num; i++ )
+					{
+						dx = mCenterX - interSections[i][0];
+						dy = mCenterY - interSections[i][1];
+						mDistList[i] = dx * dx + dy * dy;
+					}
+
+                    var crossPtX = 0;
+                    var crossPtY = 0;
+					if( num == 2 )
+					{
+						var index = ( mDistList[0] < mDistList[1] )?0:1;
+						crossPtX = interSections[ index ][0];
+						crossPtY = interSections[ index ][1];
+					}
+					else
+					{
+						crossPtX = interSections[0][0];
+						crossPtY = interSections[0][1];
+					}
+					
+					var str = Math.sqrt( mouseVecX * mouseVecX + mouseVecY * mouseVecY );
+					if( str < 2 || str > 3.5 )
+					{
+						var angle = Math.atan2( mouseVecY, mouseVecX );
+						var m =  ( str < 2 )? 2 : 3.5;
+						mouseVecX = Math.cos( angle ) * m;
+						mouseVecY = Math.sin( angle ) * m;
+					}
+					
+					for( i = 0; i < _numVertices; i++ )
+					{
+						var pt = _points[i];
+						dx = crossPtX - pt.posX;
+						dy = crossPtY - pt.posY;
+						dist = Math.sqrt( dx * dx + dy * dy );
+							
+						var pow = 10 / dist;
+						if( dist > 200 ) pow = 0.2;
+						if( pow > 5)	 pow = 5;
+						if( isNaN(dist) )pow = 0;
+						
+						pt.vX += pow * mouseVecX;
+						pt.vY += pow * mouseVecY;
+					}
+				}
+			}
+		}
+		
+		function getDistance( x1, y1, x2, y2 )
+		{
+			var dx = x1 - x2;
+			var dy = y1 - y2;
+			return Math.sqrt( dx * dx + dy * dy );
+		};
+		
+		var getIntersection = function( a, b, c )
+		{
+			var vAngle = Math.atan2( b, a );
+			var vLen = Math.sqrt( a * a + b * b );
+			var val = -( a * _x + b * _y + c ) / vLen;
+			
+			var vX = Math.cos( vAngle ) * val;
+			var vY = Math.sin( vAngle ) * val;
+			vLen = Math.sqrt( vX * vX + vY * vY );
+			
+			var r = _r - 5;
+			var ptArry = [];
+			
+			if( vLen < r )
+			{
+				var drad;
+				var irad;
+				if( vLen > 0 )
+				{
+					drad = Math.atan2( vY, vX );
+					irad = Math.acos( vLen / r );
+				}
+				else
+				{
+					drad = Math.atan2( b, a );
+					irad = Math.PI/2;
+				}
+				
+				ptArry[0] = [];
+				ptArry[1] = [];
+				
+				ptArry[0][0] = _x + r * Math.cos( drad + irad );
+				ptArry[0][1] = _y + r * Math.sin( drad + irad );
+				
+				ptArry[1][0] = _x + r * Math.cos( drad - irad );
+				ptArry[1][1] = _y + r * Math.sin( drad - irad );
+			}
+			else if( vLen == r )
+			{
+				ptArry[0] = [];
+				ptArry[0][0] = vX + _x;
+				ptArry[0][1] = vY + _y;
+			}
+			return ptArry;
+		};
+	};
+	
+	
+	function AnchorPoint2D( x, y )
+	{
+		this.vX = 0;
+		this.vY = 0;
+		this.posX = x;
+		this.posY = y;
+		this.defX = x;
+		this.defY = y;
+		this.baseX = x;
+		this.baseY = y;
+		this.thetaX = 0;
+		this.thetaY = 0;
+		this.addThetaX = Math.random()*0.05 - 0.025;
+		this.addThetaY = Math.random()*0.05 - 0.025;
+		this.yugami = Math.random()*24-12;
+	};
+	
+	
+	function onLoad()
+	{
+		var cnvses;
+		cnvses = document.getElementsByTagName( 'canvas' );
+		var imges = document.getElementsByTagName( 'img' );
+		var cnvsList = [];
+		var imgList = [];
+		
+		var I = imges.length;
+		if( cnvses.length > I )
+		{
+			I = cnvses.length;
+		}
+		
+		for( var i = 0; i < I; i++ )
+		{
+			if( cnvses[i] && cnvses[i].className == 'item_canvas' )
+			{
+				cnvsList.push( cnvses[i] );
+			}
+			if( imges[i] && imges[i].className == 'product_img' )
+			{
+				imgList.push( imges[i] );
+			}
+		}
+		
+		canvasNum = cnvsList.length;
+		
+		for( var i = 0; i < canvasNum; i++ )
+		{
+			var numVert = ~~( Math.random()*3 ) + 6;
+			var spring = Math.random()*0.015 + 0.005;
+			var friction = Math.random()*0.05 + 0.90;
+			
+			var circ = new MorfingCircle( cnvsList[i], 200, 200, 78, numVert, spring, friction, imgList[i] );
+			circ.init();
+			circ.update();
+			
+			thumbList[i] = circ;
+		}
+		
+		var logoCanvas = document.getElementById( "canvas_title" );
+		logoCircle = new MorfingCircle( logoCanvas, 370, 370, 152 );
+		logoCircle.init();
+		logoCircle.update();
+		
+		var dummy = window.setTimeout( function(){}, 1000 / 60 );
+		
+		var renderInterval = 1000 / 45;
+		var renderTimer = window.setInterval( render, renderInterval );
+	}
+	
+	function render()
+	{
+		var scrollY = document.documentElement.scrollTop || document.body.scrollTop;	// FF || safari, chrome
+		var gap = scrollY - beforeScrollY;
+		beforeScrollY = scrollY;
+		
+		for( var i = 0; i < canvasNum; i++ )
+		{
+			var thumb = thumbList[i];
+			
+			if( gap != 0 ){ thumb.addVerticalPower( gap * 0.0018 ); }
+			thumb.addRandomMotion( 0.5 );
+			thumb.update();
+		}
+		
+		if( gap != 0 ) { logoCircle.addVerticalPower( gap * 0.0018 ); }
+		logoCircle.addRandomMotion( 1.0 );
+		logoCircle.update();
+	}
+	
+	onLoad();
+}
+
+
+
+/************************************************************
+
+	mon cifaka	- main.js -
+
+************************************************************/
+
+var MODE;						// �������吟�����ｃ���≪�若������
+var WAIT_TIMER;					// �≪���＜�若�激�с�渇��紮��帥�ゃ����
+var CLOSE_TIMER;				// ���若�梧；腓堺��緇��≧�����帥�ゃ����
+
+var MOVE			= false;	// �≪���＜�若�激�с�割賢
+var HOVER			= false;	// �����鴻���若����
+var ANIMATION_TIME	= 150;		// �≪���＜�若�激�с�潟������������鐚�ms鐚�
+var WAIT_TIME		= 800;		// �≪���＜�若�激�с�潟����紮������障�с������鐚�ms鐚�
+var CLOSE_TIME		= 3000;		// ���若�梧；腓堺��緇��≧����鐚�ms鐚�
+var EASING			= 'easeInOutQuart';	// �≪���＜�若�激�с�潟���ゃ�若�吾�潟��
+
+
+
+function init()
+{
+	MODE = setMode();
+	
+	if( MODE.canvas )
+	{
+		createCanvas();
+	}
+	else if( MODE.animation == 'transition' )
+	{
+		deleteTag( 'itemList', 'canvas' );
+	}
+
+	deleteTag( 'itemList', 'img' );
+}
+
+
+function setMode()
+{
+	var BODY = document.body;
+	var agent = navigator.userAgent;
+	if( agent.indexOf( 'Android' ) != -1 || agent.indexOf( 'iPhone' ) != -1 || agent.indexOf( 'iPad' ) != -1 || agent.indexOf( 'iPod' ) != -1 )
+	{
+		var obj =
+		{
+			radius		: true,
+			canvas		: false,
+			animation	: 'transition'
+		};
+		
+		BODY.id = 'sp';
+	}
+	else
+	{
+		agent = window.navigator.userAgent.toLowerCase();
+		if ( agent.indexOf( 'msie' ) > -1 )
+		{
+			if ( agent.indexOf( 'msie 6.0' ) > -1 )
+			{
+				var obj =
+				{
+					radius		: false,
+					canvas		: false,
+					animation	: false
+				};
+			}
+			else if ( agent.indexOf( 'msie 9.0' ) > -1 )
+			{
+				var obj =
+				{
+					radius		: true,
+					canvas		: false,
+					animation	: 'interval'
+				};
+			}
+			else
+			{
+				var obj =
+				{
+					radius		: false,
+					canvas		: false,
+					animation	: 'interval'
+				};
+			}
+			
+			BODY.id = 'ie';
+		}
+		else
+		{
+			var obj =
+			{
+				radius		: true,
+				canvas		: true,
+				animation	: 'transition'
+			};
+		}
+	}
+	
+	return obj;
+}
+
+
+function deleteTag( id, target )
+{
+	var targetList;
+	
+	if( document.getElementById( id ) )
+	{
+		targetList = document.getElementById( id ).getElementsByTagName( target )
+		var I = targetList.length;
+		for( var i = 0; i < I; i++ )
+		{
+			var parent = targetList[0].parentNode;
+			
+			if( target == 'img' && !MODE.canvas )
+			{
+				var span = document.createElement( 'span' );
+				span.style.backgroundImage = 'url(' + targetList[0].src + ')';
+				span.className = 'img';
+				span.innerHTML = '�泣�����ゃ��';
+				parent.insertBefore( span, parent.firstChild );
+			}
+			
+			parent.removeChild( targetList[0] );
+		}
+	}
+}
+
+window.onload = init;
+	</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>h5画布</title>
+	<style>
+	*{margin: 0;padding: 0;}
+	body{background-color: #ccc;}
+	.main{width: 800px;margin: 70px auto 0;}
+	#mycan{display: block;background-color: #fff;box-shadow: 0 0 100px 10px #fff;margin-bottom: 10px;}
+	.clo{display: inline-block;width: 30px;height: 30px;margin:5px 10px 0 0;}
+	.linew{display: inline-block;border-radius: 50%;background-color:#000;}
+	.linew:nth-of-type(6){width: 5px;height: 5px;}
+	.linew:nth-of-type(7){width: 10px;height: 10px;}
+	.linew:nth-of-type(8){width: 15px;height: 15px;}
+	.linew:nth-of-type(9){width: 20px;height: 20px;}
+	.btn0{display: inline-block;}
+	</style>
+</head>
+<body>
+	<div class="main">
+		<canvas id="mycan" width="800" height="450"></canvas>
+		<span class="clo" style="background-color:#aac"></span>
+		<span class="clo" style="background-color:#c2c"></span>
+		<span class="clo" style="background-color:#64c"></span>
+		<span class="clo" style="background-color:#dac"></span>
+		<span class="clo" style="background-color:#b8c"></span>
+		<span class="linew"></span>
+		<span class="linew"></span>
+		<span class="linew"></span>
+		<span class="linew"></span>
+		<input type="button" id="btna" class="btn0" value="描绘图像">
+		<input type="button" id="btnb" class="btn0" value="清除画布">
+		<input type="button" id="btnc" class="btn0" value="填充图像">
+	</div>
+	<script>
+	function G(sId){
+		return document.getElementById(sId);
+	};
+		var canv=G('mycan');
+		var ctx=canv.getContext('2d');
+		var btna=G('btna');
+		var btnb=G('btnb');
+		var btnc=G('btnc');
+	
+	var diansz=[];
+	var s=0;
+	canv.onclick=function(e){
+		var djwzX=e.offsetX;
+		var djwzY=e.offsetY;
+		diansz[s]={'x':djwzX,'y':djwzY};
+		console.log(diansz);
+		s++;
+	};
+	cs=0;
+	canv.onmousedown=function(e){
+		djzwzX=e.offsetX;
+		djzwzY=e.offsetY;
+		cs=1;
+	};
+	canv.onmouseup=function(e){
+		cs=0;
+	};
+	canv.onmousemove=function(e){
+		if(cs==1){
+			ctx.beginPath();	
+			ctx.moveTo(djzwzX,djzwzY);
+			ctx.lineTo(e.offsetX,e.offsetY);
+			ctx.stroke();
+			ctx.closePath();
+			djzwzX=e.offsetX;
+			djzwzY=e.offsetY;
+		};
+	};
+
+	var colors=[0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
+	btna.onclick=function(){
+		if(diansz==[]){
+			return;
+		};
+		ctx.beginPath();
+		ctx.moveTo(diansz[0].x,diansz[0].y);
+		for(var c=1;c<diansz.length;c++){
+			ctx.lineTo(diansz[c].x,diansz[c].y);
+			if(c==(diansz.length-1)){
+				ctx.lineTo(diansz[0].x,diansz[0].y);
+			};
+			if(diansz[c].x<(diansz[0].x+10)&&diansz[c].x>(diansz[0].x-10)&&diansz[c].y<(diansz[0].y+10)&&diansz[c].y>(diansz[0].y-10)){
+				diansz=[];
+				s=0;
+			};
+		};
+		var sc="";
+		for(var i=0;i<6;i++){
+			la=Math.round(Math.random()*16);
+			var ca=colors[la];
+			sc=sc+ca;
+		};
+		ctx.strokeStyle="#000";
+		ctx.lineWidth=5;
+		ctx.lineJoin="round";
+		ctx.lineCap="round";
+		ctx.strokeStyle="#"+sc;
+			btnc.onclick=function(){
+				ctx.fillStyle="#"+sc;
+	 			ctx.fill();
+			};
+		ctx.stroke();
+		ctx.closePath();
+	};
+
+	btnb.onclick=function(){
+		diansz=[];
+		s=0;
+		ctx.clearRect(0,0,800,450);
+	};
+		
+	
+
+// var colors=[0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
+// 	var sc="";
+// 	function cjline(){
+// 		var qszb={'x':Math.round(Math.random()*800),
+// 				'y':Math.round(Math.random()*450)};
+// 		var zdzba={'x':Math.round(Math.random()*800),
+// 				'y':Math.round(Math.random()*450)};
+// 		var zdzbb={'x':Math.round(Math.random()*800),
+// 				'y':Math.round(Math.random()*450)};
+// 		var linekd=Math.round(Math.random()*10);
+// 		var linebg=Math.round(Math.random()*1000000);
+
+// 		var sc="";
+// 		for(var i=0;i<6;i++){
+// 			la=Math.round(Math.random()*16);
+// 			var ca=colors[la];
+// 			sc=sc+ca;
+// 		};
+// 		ctx.beginPath();
+// 		ctx.moveTo(qszb.x,qszb.y);
+// 		ctx.lineTo(zdzba.x,zdzba.y);
+// 		ctx.lineTo(zdzbb.x,zdzbb.y);
+// 		ctx.moveTo(qszb.x,qszb.y);
+// 		ctx.lineTo(zdzbb.x,zdzbb.y);
+// 		ctx.lineWidth=linekd;
+// 		ctx.strokeStyle="#"+sc;
+// 		ctx.lineJoin="round";
+// 		ctx.lineCap="round";
+// 		function filla(){
+// 			ctx.fillStyle="#"+sc;
+// 			ctx.fill();
+// 		};
+// 		setTimeout(filla,500);
+// 		ctx.stroke();
+// 		ctx.closePath();
+// 	};
+// 	// setInterval(cjline,1500);
+
+
+
+
+	</script>
+</body>
+</html>
