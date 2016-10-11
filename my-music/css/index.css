@@ -21,14 +21,14 @@
 	*{margin: 0;padding: 0;color: #fff;font-family: "微软雅黑 Light";}
 	html{background-color: #555;position: relative;height: 100%;}
 	audio{float: left;}
-	#box{height: 95px;position: absolute;left: 0;bottom:0;background:linear-gradient(rgba(255,255,255,0),rgba(0,0,0,1));}
-	h5{font-family: myicon;float: left;width: 35px;height: 35px;margin:30px 40px 0 0;text-align: center;border-radius:18px;line-height: 35px;cursor:pointer;font-weight: 100;color: #000;background-color: #444;font-size: 26px;box-shadow:0 0 15px 2px #000;cursor:pointer;}
+	#box{width: 100%;height: 95px;position: absolute;left: 0;bottom:0;background:linear-gradient(rgba(255,255,255,0),rgba(0,0,0,1));}
+	h5{font-family: myicon;float: left;width: 35px;height: 35px;margin:30px 40px 0 0;text-align: center;border-radius:18px;line-height: 35px;cursor:pointer;font-weight: 100;color: #000;background-color: #444;font-size: 26px;box-shadow:0 0 15px 2px #000;}
 	#btnshang{margin-left: 120px;}
 	#btnplay{width: 60px;height: 60px;margin-top: 15px;border-radius:30px;line-height: 60px;font-size: 34px;}
 	#btnplay:hover{font-size: 40px;box-shadow:0 0 20px 2px rgba(230,230,230,0.4);}
 	h5:hover{animation: zhuan 2s;font-size: 20px;color: #fff;background-color:rgba(200,200,200,0.6);box-shadow:0 0 20px 2px rgba(230,230,230,0.4);}
 	#btnstop{line-height: 39px;}
-	#mupic{position: absolute;left: 34%;top:14px;width: 60px;height: 60px;background-image:url(../images/00_2.jpg);-webkit-background-size: 100% 100%;background-size: 100% 100%;box-shadow:0 0 15px 2px #000;color: #fff;font-size: 14px;line-height: 30px;text-align: center;font-weight: 900;cursor:pointer;}
+	#mupic{position: absolute;left: 34%;top:14px;cursor: pointer;width: 60px;height: 60px;background-image:url(../images/00_2.jpg);-webkit-background-size: 100% 100%;background-size: 100% 100%;box-shadow:0 0 15px 2px #000;color: #fff;font-size: 14px;line-height: 30px;text-align: center;font-weight: 900;}
 	#hname{position: absolute;left: 43%;top:15px;font-size: 14px;line-height: 30px;color: #ccc;}
 	#jindubox{position: relative;margin: 45px 10px 10px 120px;width: 420px;height: 15px;overflow: hidden;float: left;}
 	#jindu{overflow: hidden;position: absolute;top: 6px;left: 10px;width: 400px;height: 3px;border-radius:3px;background-color: #fff;}
@@ -44,11 +44,9 @@
 	.slidenone{animation: disblo 2s;}
 	.slideshownone{transform: perspective(800px) translate3d(0,-30px,0) rotate3d(1, 0, 0, -180deg);}
 	#gccc{display: none;position: absolute;top: 0;left: 18%;z-index:99;width: 60%;margin: 0 auto;height: 450px;background-color: rgba(250,250,250,0.8);}
-	#gbgc{position: absolute;right: 14px;top: 0;width: 30px;height: 30px;font-size: 34px;line-height: 28px;text-align: center;background-color: #666;cursor:pointer;}
-	#gctxt{position: relative;width: 100%;height: 400px;overflow: auto;padding:25px 0;}
-	/*#dqgcc{position: absolute;top:0;left: 10%;width: 80%;height: 34px;background-color: rgba(190,200,240,0.4);border-radius:20%;}*/
+	#gbgc{position: absolute;right: 14px;top: 0;cursor: pointer; width: 30px;height: 30px;font-size: 34px;line-height: 28px;text-align: center;background-color: #666;}
+	#gctxt{width: 100%;height: 100%;overflow: auto;}
 	#gctxt p{font-size: 18px;text-align: center;line-height: 34px;color: #333;}
-	.gcppass{background-color: yellow;}
 	#slideshow-border-top{width: 100%;}
 	#gallery-slider #slider-bottom-controls #slider-scroll {background: #555;}
 	#gallery-slider #slider-bottom-controls div.knob {height: 5px;margin-top: 5px;background: #ccc;border-radius:3px;}
