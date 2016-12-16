@@ -3,3 +3,4 @@ ctrl+j  多行变一行
 ctrl+alt+f  整理代码格式
 ctrl+shift+】  打开选中代码折叠
 ctrl+shift+k  删除整行
+ctrl+shift+l  选中区域行末加光标
